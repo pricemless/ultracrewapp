@@ -2,6 +2,11 @@ const express = require('express')
 const app = express()
 const PORT = 3000
 
+app.use(express.json())
+
+const raceRoutes = require('./routes/race')
+app.use('/', raceRoutes)
+
 app.get('/', (req, res) => {
   res.send('UltraCrew is alive!')
 })
