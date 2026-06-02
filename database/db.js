@@ -21,5 +21,18 @@ db.exec(`
     FOREIGN KEY (race_id) REFERENCES races(id)
   )
 `)
-
+db.exec(`
+  CREATE TABLE IF NOT EXISTS pacers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL,
+    race_name TEXT NOT NULL,
+    race_date TEXT,
+    miles_start INTEGER,
+    miles_end INTEGER,
+    experience TEXT,
+    contact TEXT NOT NULL,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`)
 module.exports = db

@@ -7,10 +7,13 @@ app.use(cors())
 app.use(express.json())
 
 const raceRoutes = require('./routes/race')
+const pacerRoutes = require('./routes/pacers')
+
 app.use('/', raceRoutes)
+app.use('/', pacerRoutes)
 
 app.get('/', (req, res) => {
-  res.send('UltraCrew is alive!')
+  res.send('DropBag is alive!')
 })
 
 app.listen(PORT, () => {
