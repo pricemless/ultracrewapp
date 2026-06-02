@@ -2,6 +2,11 @@ const express = require('express')
 const router = express.Router()
 const db = require('../database/db')
 
+router.get('/races', (req, res) => {
+  const races = db.prepare('SELECT * FROM races').all()
+  res.json(races)
+})
+
 router.post('/race', (req, res) => {
   const { name, distance } = req.body
   if (!name || !distance) {
