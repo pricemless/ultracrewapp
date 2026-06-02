@@ -20,37 +20,52 @@ function Home() {
   }
 
   return (
-    <div style={{ fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-      <h2>Races</h2>
+    <div className="page">
+      <div className="page-header">
+        <h1>Race Dashboard</h1>
+        <p>Select a race to view aid stations and crew notes</p>
+      </div>
+
       {races.map(race => (
-        <div key={race.id} onClick={() => selectRace(race)} style={{
-          padding: '15px',
-          margin: '10px 0',
-          background: selectedRace?.id === race.id ? '#333' : '#111',
-          border: '1px solid #444',
-          cursor: 'pointer',
-          borderRadius: '8px'
-        }}>
-          <strong>{race.name}</strong> — {race.distance} miles
+        <div
+          key={race.id}
+          className={`card ${selectedRace?.id === race.id ? 'active' : ''}`}
+          onClick={() => selectRace(race)}
+        >
+          <div className="card-title">{race.name}</div>
+          <div className="card-meta">{race.distance} miles</div>
         </div>
       ))}
+
       {selectedRace && (
-        <div>
-          <h2>{selectedRace.name} — Aid Stations</h2>
+        <>
+          <hr className="divider" />
+          <div className="page-header">
+            <h2>{selectedRace.name} — Aid Stations</h2>
+            <p>{stations.length} stations · {selectedRace.distance} miles total</p>
+          </div>
+
+          {stations.length === 0 && (
+            <div className="empty-state">
+              <h3>No Stations Yet</h3>
+              <p>Add aid stations to this race</p>
+            </div>
+          )}
+
           {stations.map(station => (
-            <div key={station.id} style={{
-              padding: '15px',
-              margin: '10px 0',
-              background: '#111',
-              border: '1px solid #444',
-              borderRadius: '8px'
-            }}>
-              <strong>{station.name}</strong> — Mile {station.distance}<br/>
-              <span style={{ color: '#f90' }}>Cutoff: {station.cutoff_time}</span><br/>
-              <span style={{ color: '#aaa' }}>Crew: {station.crew_notes}</span>
+            <div key={station.id} className="station-card">
+              <div className="station-mile">
+                {station.distance}
+                <span>MILE</span>
+              </div>
+              <div>
+                <div className="station-name">{station.name}</div>
+                <div className="station-cutoff">⏱ {station.cutoff_time}</div>
+              </div>
+              <div className="station-notes">{station.crew_notes}</div>
             </div>
           ))}
-        </div>
+        </>
       )}
     </div>
   )

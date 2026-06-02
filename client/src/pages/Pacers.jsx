@@ -26,6 +26,7 @@ function Pacers() {
   }
 
   function handleSubmit() {
+    if (!form.race_name || !form.contact) return
     axios.post('http://localhost:3000/pacers', form)
       .then(() => {
         fetchListings()
@@ -38,55 +39,103 @@ function Pacers() {
       .catch(err => console.error(err))
   }
 
+  function update(field, value) {
+    setForm({ ...form, [field]: value })
+  }
+
   const filtered = listings.filter(l =>
     l.race_name.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
-    <div style={{ fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-      <h2>Pacer Finder</h2>
-      <p style={{ color: '#aaa' }}>Find a pacer or offer to pace at an upcoming race.</p>
+    <div className="page">
+      <div className="page-header">
+        <h1>Pacer Finder</h1>
+        <p>Find a pacer or offer to pace at an upcoming race</p>
+      </div>
 
-      <div style={{ background: '#111', border: '1px solid #444', borderRadius: '8px', padding: '20px', marginBottom: '30px' }}>
+      <div className="form-card">
         <h3>Post a Listing</h3>
-        <select value={form.type} onChange={e => setForm({...form, type: e.target.value})}
-          style={{ width: '100%', padding: '10px', marginBottom: '10px', background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px' }}>
-          <option value="needed">I need a pacer</option>
-          <option value="available">I am available to pace</option>
-        </select>
-        {['race_name', 'race_date', 'miles_start', 'miles_end', 'experience', 'contact', 'notes'].map(field => (
-          <input key={field} placeholder={field.replace('_', ' ')}
-            value={form[field]}
-            onChange={e => setForm({...form, [field]: e.target.value})}
-            style={{ width: '100%', padding: '10px', marginBottom: '10px', background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', boxSizing: 'border-box' }}
-          />
-        ))}
-        <button onClick={handleSubmit}
-          style={{ width: '100%', padding: '12px', background: '#f90', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+        <br />
+
+        <div className="form-field">
+          <label>I am...</label>
+          <select value={form.type} onChange={e => update('type', e.target.value)}>
+            <option value="needed">Looking for a pacer</option>
+            <option value="available">Available to pace</option>
+          </select>
+        </div>
+
+        <div className="form-grid">
+          <div className="form-field">
+            <label>Race Name</label>
+            <input placeholder="Leadville 100" value={form.race_name}
+              onChange={e => update('race_name', e.target.value)} />
+          </div>
+          <div className="form-field">
+            <label>Race Date</label>
+            <input placeholder="August 2026" value={form.race_date}
+              onChange={e => update('race_date', e.target.value)} />
+          </div>
+          <div className="form-field">
+            <label>Miles Start</label>
+            <input placeholder="50" value={form.miles_start}
+              onChange={e => update('miles_start', e.target.value)} />
+          </div>
+          <div className="form-field">
+            <label>Miles End</label>
+            <input placeholder="100" value={form.miles_end}
+              onChange={e => update('miles_end', e.target.value)} />
+          </div>
+        </div>
+
+        <div className="form-field">
+          <label>Experience</label>
+          <input placeholder="Ran Leadville twice, know the course well"
+            value={form.experience} onChange={e => update('experience', e.target.value)} />
+        </div>
+        <div className="form-field">
+          <label>Contact</label>
+          <input placeholder="email or instagram handle"
+            value={form.contact} onChange={e => update('contact', e.target.value)} />
+        </div>
+        <div className="form-field">
+          <label>Notes</label>
+          <input placeholder="anything else to know"
+            value={form.notes} onChange={e => update('notes', e.target.value)} />
+        </div>
+
+        <button className="btn-primary" onClick={handleSubmit}>
           Post Listing
         </button>
       </div>
 
-      <input placeholder="Search by race name..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        style={{ width: '100%', padding: '10px', marginBottom: '20px', background: '#222', color: '#fff', border: '1px solid #444', borderRadius: '6px', boxSizing: 'border-box' }}
-      />
+      <div className="search-bar">
+        <input placeholder="Search by race name..."
+          value={search} onChange={e => setSearch(e.target.value)} />
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="empty-state">
+          <h3>No Listings Found</h3>
+          <p>Be the first to post for this race</p>
+        </div>
+      )}
 
       {filtered.map(listing => (
-        <div key={listing.id} style={{
-          padding: '15px', margin: '10px 0',
-          background: '#111', border: `1px solid ${listing.type === 'needed' ? '#f90' : '#0af'}`,
-          borderRadius: '8px'
-        }}>
-          <span style={{ color: listing.type === 'needed' ? '#f90' : '#0af', fontWeight: 'bold' }}>
-            {listing.type === 'needed' ? '🏃 NEEDS PACER' : '⚡ AVAILABLE TO PACE'}
+        <div key={listing.id} className={`pacer-card ${listing.type}`}>
+          <span className={`tag ${listing.type === 'needed' ? 'tag-orange' : 'tag-blue'}`}>
+            {listing.type === 'needed' ? '🏃 Needs Pacer' : '⚡ Available to Pace'}
           </span>
-          <br/><strong>{listing.race_name}</strong> — {listing.race_date}<br/>
-          <span style={{ color: '#aaa' }}>Miles {listing.miles_start}–{listing.miles_end}</span><br/>
-          <span style={{ color: '#aaa' }}>{listing.experience}</span><br/>
-          <span style={{ color: '#0af' }}>Contact: {listing.contact}</span><br/>
-          {listing.notes && <span style={{ color: '#888' }}>{listing.notes}</span>}
+          <div className="pacer-race">{listing.race_name}</div>
+          <div className="pacer-miles">
+            Miles {listing.miles_start}–{listing.miles_end} · {listing.race_date}
+          </div>
+          {listing.experience && (
+            <div className="pacer-miles" style={{ marginTop: '6px' }}>{listing.experience}</div>
+          )}
+          <div className="pacer-contact">📬 {listing.contact}</div>
+          {listing.notes && <div className="pacer-notes">"{listing.notes}"</div>}
         </div>
       ))}
     </div>
